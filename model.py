@@ -7,22 +7,25 @@ load_dotenv()
 # Inject Streamlit secrets into environment variables if running in Streamlit
 try:
     import streamlit as st
-    if "HUGGINGFACEHUB_API_TOKEN" in st.secrets:
-        token = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
-        os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
-        os.environ["HF_TOKEN"] = token
-    if "HF_TOKEN" in st.secrets:
-        token = st.secrets["HF_TOKEN"]
-        os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
-        os.environ["HF_TOKEN"] = token
-except Exception:
-    pass
+    # Case-insensitive scan of all secrets to find matching token names
+    for key in st.secrets.keys():
+        upper_key = key.upper()
+        if upper_key in ["HUGGINGFACEHUB_API_TOKEN", "HF_TOKEN", "HUGGINGFACE_API_KEY", "HF_API_KEY"]:
+            token = st.secrets[key]
+            os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
+            os.environ["HF_TOKEN"] = token
+            os.environ["HUGGINGFACE_API_KEY"] = token
+except Exception as e:
+    print(f"Error reading secrets: {e}")
 
-# Synchronize local environment variables
-if os.environ.get("HUGGINGFACEHUB_API_TOKEN") and not os.environ.get("HF_TOKEN"):
-    os.environ["HF_TOKEN"] = os.environ["HUGGINGFACEHUB_API_TOKEN"]
-elif os.environ.get("HF_TOKEN") and not os.environ.get("HUGGINGFACEHUB_API_TOKEN"):
-    os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.environ["HF_TOKEN"]
+# Synchronize local/system environment variables (case-insensitive check)
+for env_key in list(os.environ.keys()):
+    upper_key = env_key.upper()
+    if upper_key in ["HUGGINGFACEHUB_API_TOKEN", "HF_TOKEN", "HUGGINGFACE_API_KEY", "HF_API_KEY"]:
+        token = os.environ[env_key]
+        os.environ["HUGGINGFACEHUB_API_TOKEN"] = token
+        os.environ["HF_TOKEN"] = token
+        os.environ["HUGGINGFACE_API_KEY"] = token
 
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 

@@ -219,6 +219,30 @@ if page == "💬 Wajid's REENO chat bot":
             except Exception as e:
                 status_text.update(label="Error occurred!", state="error", expanded=True)
                 st.error(f"Error invoking model: {str(e)}")
+                
+                # Diagnostics box to troubleshoot secrets
+                with st.expander("🛠️ Credentials Diagnostics Dashboard"):
+                    st.warning("Use the metrics below to inspect if the deployment has successfully loaded your secrets.")
+                    
+                    # Environment Variables Info
+                    st.markdown("### Environment Variables")
+                    st.json({
+                        "HF_TOKEN_set": "HF_TOKEN" in os.environ,
+                        "HUGGINGFACEHUB_API_TOKEN_set": "HUGGINGFACEHUB_API_TOKEN" in os.environ,
+                        "HUGGINGFACE_API_KEY_set": "HUGGINGFACE_API_KEY" in os.environ,
+                        "HF_TOKEN_length": len(os.environ.get("HF_TOKEN", "")),
+                        "HUGGINGFACEHUB_API_TOKEN_length": len(os.environ.get("HUGGINGFACEHUB_API_TOKEN", ""))
+                    })
+                    
+                    # Streamlit Secrets Info
+                    try:
+                        st.markdown("### Streamlit Secrets")
+                        st.json({
+                            "available_secrets_keys": list(st.secrets.keys()) if hasattr(st, "secrets") else [],
+                            "secrets_lengths": {k: len(str(st.secrets[k])) for k in st.secrets.keys()} if hasattr(st, "secrets") else {}
+                        })
+                    except Exception as secrets_err:
+                        st.error(f"Error accessing Streamlit Secrets: {secrets_err}")
 
 # ----------------- PAGE 2: HISTORY & LOGS -----------------
 elif page == "📊 Database History & Logs":
