@@ -6,6 +6,28 @@ import os
 from token_counter import count_token
 from database import save_chat
 
+# Database Auto-Initialization
+def init_db():
+    conn = sqlite3.connect("chatbot.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS chat_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        user_query TEXT,
+        ai_response TEXT,
+        input_tokens INTEGER,
+        output_tokens INTEGER,
+        total_tokens INTEGER,
+        estimated_cost REAL,
+        model_name TEXT
+    )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
+
 # Must be the first streamlit call
 st.set_page_config(
     page_title="Wajid's REENO chat bot & Logs Dashboard",
