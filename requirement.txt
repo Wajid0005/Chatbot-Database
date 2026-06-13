@@ -1,0 +1,14 @@
+langchain
+langchain-core
+langchain-huggingface
+huggingface_hub
+transformers
+sentence-transformers
+python-dotenv
+numpy 
+scikit-learn
+streamlit
+pandas
+pandas-gbq
+jinja2
+tabulate
