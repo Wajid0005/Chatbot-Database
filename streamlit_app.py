@@ -1,8 +1,33 @@
+import os
 import streamlit as st
+
+# Immediate environment variable setup from secrets
+try:
+    if hasattr(st, "secrets"):
+        for key in list(st.secrets.keys()):
+            val = st.secrets[key]
+            if val:
+                ukey = key.upper()
+                if ukey in ["HUGGINGFACEHUB_API_TOKEN", "HF_TOKEN", "HUGGINGFACE_API_KEY", "HF_API_KEY"]:
+                    os.environ["HUGGINGFACEHUB_API_TOKEN"] = str(val)
+                    os.environ["HF_TOKEN"] = str(val)
+                    os.environ["HUGGINGFACE_API_KEY"] = str(val)
+except Exception:
+    pass
+
+# Synchronize existing environment variables
+for env_key in list(os.environ.keys()):
+    val = os.environ[env_key]
+    if val:
+        ukey = env_key.upper()
+        if ukey in ["HUGGINGFACEHUB_API_TOKEN", "HF_TOKEN", "HUGGINGFACE_API_KEY", "HF_API_KEY"]:
+            os.environ["HUGGINGFACEHUB_API_TOKEN"] = str(val)
+            os.environ["HF_TOKEN"] = str(val)
+            os.environ["HUGGINGFACE_API_KEY"] = str(val)
+
 import sqlite3
 import pandas as pd
 import datetime
-import os
 from token_counter import count_token
 from database import save_chat
 
